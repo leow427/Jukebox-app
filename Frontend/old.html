@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Jukebox</title>
+    <title>Campus Jukebox — Classic Edition</title>
     <style>
       :root {
         color-scheme: dark;
@@ -50,17 +50,6 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        gap: 16px;
-      }
-
-      header p {
-        margin: 0;
-        color: var(--muted);
-      }
-
-      h1 {
-        font-size: 2rem;
-        margin: 8px 0 0;
       }
 
       .theme-toggle {
@@ -71,12 +60,22 @@
         color: var(--text);
         font-weight: 600;
         cursor: pointer;
-        transition: transform 0.1s ease, border-color 0.1s ease;
+        transition: transform 0.15s ease, border-color 0.15s ease;
       }
 
       .theme-toggle:hover {
         transform: translateY(-1px);
         border-color: var(--accent);
+      }
+
+      header p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      h1 {
+        font-size: 2rem;
+        margin: 8px 0 0;
       }
 
       .section {
@@ -194,7 +193,7 @@
       }
 
       #q {
-        width: 95%;
+        width: 100%;
         border-radius: 999px;
         padding: 14px 18px;
         border: 1px solid var(--border);
@@ -251,6 +250,7 @@
         }
         .top-bar {
           flex-direction: column;
+          gap: 12px;
           align-items: flex-start;
         }
       }
@@ -287,7 +287,7 @@
       <section class="section">
         <div class="section-header">
           <h2>Featured Playlists</h2>
-          <p class="muted">Presets we can always lean on.</p>
+          <p class="muted">Five presets the crowd can always lean on.</p>
         </div>
         <div class="grid" id="playlist-grid"></div>
       </section>
@@ -317,8 +317,11 @@
       let timer;
 
       const playlists = [
-        { name: 'Obsession', desc: 'A little bit of this... A little bit of that...', cover: 'https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da849318af96125a5ba045e7c346', playlistUri: 'spotify:playlist:1LNq2XdOR7uwI5QUF0R1PD' },
-        { name: 'Rainy Night', desc: 'Take a beat with this playlist.', cover: 'https://mosaic.scdn.co/640/ab67616d00001e02291c9ace63ec929a08d91699ab67616d00001e024fb043195e8d07e72edc7226ab67616d00001e02e4ca61044bed05034bfef216ab67616d00001e02ed801e58a9ababdea6ac7ce4', playlistUri: 'spotify:playlist:6trooOM8TetI8UfCtw6cNH' }
+        { name: 'Obsession', desc: 'Feel-good pop to start the day.', cover: 'https://image-cdn-fa.spotifycdn.com/image/ab67706c0000da849318af96125a5ba045e7c346', playlistUri: 'spotify:playlist:37i9dQZF1DX5Ozry5U6G0d' },
+        { name: 'Lo-Fi Focus', desc: 'Homework-safe beats and mellow grooves.', cover: 'https://images.unsplash.com/photo-1470229538611-16ba8c7ffbd7?auto=format&fit=crop&w=500&q=80', playlistUri: 'spotify:playlist:37i9dQZF1DX8Uebhn9wzrS' },
+        { name: 'Throwback Gym', desc: 'High-energy 2000s hits.', cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=500&q=80', playlistUri: 'spotify:playlist:37i9dQZF1DX4ikq9Kftl7E' },
+        { name: 'Indie Study Hall', desc: 'Soft indie vibes for late nights.', cover: 'https://images.unsplash.com/photo-1454922915609-78549ad709bb?auto=format&fit=crop&w=500&q=80', playlistUri: 'spotify:playlist:37i9dQZF1DX6ziVCJnEm59' },
+        { name: 'Friday Lights', desc: 'EDM + dance for the weekend rush.', cover: 'https://images.unsplash.com/photo-1470226075140-60a9f186f23d?auto=format&fit=crop&w=500&q=80', playlistUri: 'spotify:playlist:37i9dQZF1DXaXB8fQg7xif' }
       ];
 
       const showToast = (msg, color = 'var(--accent)') => {
