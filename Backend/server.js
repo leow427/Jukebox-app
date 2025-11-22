@@ -7,6 +7,8 @@ import fetch from 'node-fetch';
 import path from 'path';
 import { fileURLToPath } from 'url';
 const queueList = [];
+import Database from 'better-sqlite3';
+
 
 dotenv.config();
 
@@ -18,8 +20,19 @@ app.get('/health', (req, res) => {
     res.json({ ok: true})
 })
 
+//make new database
+const db = new Database('jukebox.db');
 
-// needed for __dirname with ES modules
+//make table
+const query = `
+    CREATE TABLE users(
+        id INTEGER PRIMARY KEY,
+        name STRING NOT NULL
+    )
+`;
+
+
+// needed for __dirname with ES modules to resolve paths to folders like frontend
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -33,10 +46,10 @@ const TOKENS_FILE = './tokens.json'
 let tokens = {
     accessToken: null,
     refreshToken: null,
-    expiresIn: 0 //in ms
+    expiresIn: 0 //in ms, for automatic refresh 
 };
 
-function loadTokens() {
+function loadTokens() { 
     try {
         const raw = fs.readFileSync(TOKENS_FILE, 'utf8');
         const t =JSON.parse(raw);
@@ -55,7 +68,7 @@ loadTokens();
 
 let pkce = {verifier: null};
 
-//.env variables
+//.env variables - top secret shhhhhh
 const CLIENT_ID = (process.env.SPOTIFY_CLIENT_ID || '').trim();
 const REDIRECT_URI = (process.env.REDIRECT_URI || '').trim();
 
@@ -84,14 +97,15 @@ function b64url(buf) {
 }
 
 
-
+//login page to get access and refresh tokens (NEEDED) 
+//if error occurs with playback, theres a good change a re-login is the solve
 app.get('/login',(req, res) => {
     pkce.verifier = b64url(crypto.randomBytes(64));
 
     const challenge = b64url(
     crypto.createHash('sha256').update(pkce.verifier).digest()
   );
-    const params = new URLSearchParams({
+    const params = new URLSearchParams({  //json format from spotify web API, if you want something added, check spotify web docs
         client_id: CLIENT_ID,
         response_type: 'code',
         redirect_uri: REDIRECT_URI,
@@ -109,7 +123,7 @@ app.get('/login',(req, res) => {
     res.redirect('https://accounts.spotify.com/authorize?' + params.toString());
 });
 
-
+//callback route must stay due to spotify API requirements - happens right after /login but reroutes to root page once login is approved and tokens are exchanged
 app.get('/callback', async (req, res) => {
   console.log('[callback] query:', req.query);
  
@@ -165,7 +179,7 @@ app.get('/callback', async (req, res) => {
         }
 });
 
-async function refreshAccessToken() {
+async function refreshAccessToken() { //does what it says, gets new tokens
     const body = new URLSearchParams({
         client_id: CLIENT_ID,
         grant_type: 'refresh_token',
@@ -181,10 +195,10 @@ async function refreshAccessToken() {
     if (!resp.ok) {
         console.error('[tokens] refresh failed', j);
     }
-    tokens.accessToken = j.access_token;
+    tokens.accessToken = j.access_token;  //swaps short lived token to store it locally
 
-    if (j.refresh_token) tokens.refreshToken = j.refresh_token;
-    tokens.expiresIn = Date.now() + (j.expires_in * 1000);
+    if (j.refresh_token) tokens.refreshToken = j.refresh_token; //says if refresh token exists, overwrite it with the new one
+    tokens.expiresIn = Date.now() + (j.expires_in * 1000);  
     saveTokens();
     console.log('[tokens] refreshed, new expiry', new Date(tokens.expiresIn).toISOString());
 }

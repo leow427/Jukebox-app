@@ -24,6 +24,7 @@
         --muted: #d6bfa7;
         --border: #4c2c1c;
         --text: #fdf5e6;
+        --glow-color: rgba(244, 194, 107, 0.25);
         background-image:
           radial-gradient(circle at 15% 20%, rgba(244,194,107,0.25), transparent 40%),
           linear-gradient(120deg, rgba(44,27,19,0.85), rgba(14,8,6,0.95));
@@ -35,8 +36,19 @@
         color: var(--text);
         min-height: 100vh;
         transition: background 0.4s ease;
+        position: relative;
+        --glow-color: rgba(29, 185, 84, 0.25);
       }
 
+      body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(circle at var(--glow-x, 50%) var(--glow-y, 30%), var(--glow-color, rgba(29, 185, 84, 0.25)), transparent 45%);
+        transition: background 0.15s ease;
+        z-index: -1;
+      }
       .page {
         max-width: 960px;
         margin: 0 auto;
@@ -106,14 +118,49 @@
         font-size: 1.1rem;
         margin: 0;
       }
-      .now-playing__art {
-        width: 140px;
-        height: 140px;
-        border-radius: 12px;
-        object-fit: cover;
-        margin-top: 10px;
-        border: 1px solid var(--border);
+      .now-playing__artwrap {
+        width: 160px;
+        height: 160px;
+        margin-top: 14px;
         display: none;
+      }
+      .vinyl-disc {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background-image: url('https://gallery.yopriceville.com/var/resizes/Free-Clipart-Pictures/Music-PNG/Gramophone_Vinyl_LP_Record_PNG_Transparent_Clip_Art_Image.png?m=1462983196');
+        background-size: 110% 110%;
+        background-position: center;
+        box-shadow: 0 0 20px rgba(0,0,0,0.45);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .vinyl-disc::before {
+        content: '';
+        position: absolute;
+        inset: 8%;
+        border-radius: 50%;
+        border: 2px solid rgba(255,255,255,0.12);
+        mix-blend-mode: screen;
+      }
+      .vinyl-disc--spinning {
+        animation: spinThat 5s linear infinite;
+      }
+      .now-playing__art {
+        width: 40%;
+        height: 40%;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid rgba(0,0,0,0.7);
+        box-shadow: inset 0 0 6px rgba(0,0,0,0.6);
+        position: relative;
+        z-index: 2;
+      }
+      @keyframes spinThat {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
       }
 
       .muted {
@@ -150,6 +197,87 @@
 
       body.theme-blues .btn--accent {
         color: #1b1410;
+      }
+
+      .sparkle-btn {
+        --sparkle-color: #000;
+        --sparkle-shadow: rgba(0, 0, 0, 0.35);
+        --sparkle-glare: hsla(0, 0%, 100%, 0.8);
+        --sparkle-hover: 0.4;
+        --sparkle-pos: 0;
+        position: relative;
+        overflow: hidden;
+        color: transparent;
+        padding: 12px 22px;
+      }
+
+      .sparkle-btn:hover {
+        --sparkle-hover: 1;
+        --sparkle-pos: 1;
+      }
+
+      .sparkle-btn:active {
+        --sparkle-hover: 0;
+      }
+
+      .sparkle-label {
+        display: inline-block;
+        font-size: 1rem;
+        font-weight: 600;
+        text-decoration: none;
+        text-shadow:
+          calc(var(--sparkle-hover) * -0px) calc(var(--sparkle-hover) * 0px) var(--sparkle-shadow),
+          calc(var(--sparkle-hover) * -1px) calc(var(--sparkle-hover) * 1px) var(--sparkle-shadow),
+          calc(var(--sparkle-hover) * -2px) calc(var(--sparkle-hover) * 2px) var(--sparkle-shadow);
+        transform: translate(
+          calc(var(--sparkle-hover) * 2px),
+          calc(var(--sparkle-hover) * -2px)
+        );
+      }
+
+      .sparkle-label:last-of-type {
+        position: absolute;
+        inset: 0;
+        padding: 12px 22px;
+        background: linear-gradient(
+          120deg,
+          transparent 0 55%,
+          var(--sparkle-glare) 55% 60%,
+          transparent 60% 70%,
+          var(--sparkle-glare) 70% 85%,
+          transparent 85%
+        ) calc(var(--sparkle-pos) * -200%) 0 / 200% 100%, var(--sparkle-color);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: none;
+      }
+
+      .sparkle-btn svg {
+        position: absolute;
+        width: 16px;
+        aspect-ratio: 1;
+        fill: var(--sparkle-glare);
+        top: calc(var(--y, 50) * 1%);
+        left: calc(var(--x, 0) * 1%);
+        transform: translate(-50%, -50%) scale(0);
+        pointer-events: none;
+      }
+
+      .sparkle-btn svg:nth-of-type(1) { --x: 5; --y: 20; --s: 1.3; --d: 0.1; }
+      .sparkle-btn svg:nth-of-type(2) { --x: 15; --y: 80; --s: 1.2; --d: 0.25; }
+      .sparkle-btn svg:nth-of-type(3) { --x: 45; --y: 40; --s: 1.1; --d: 0.4; }
+      .sparkle-btn svg:nth-of-type(4) { --x: 75; --y: 60; --s: 1; --d: 0.55; }
+      .sparkle-btn svg:nth-of-type(5) { --x: 95; --y: 25; --s: 0.9; --d: 0.7; }
+
+      .sparkle-btn:hover svg {
+        animation: sparkle 0.75s calc(var(--d) * 0.2s) both;
+      }
+
+      @keyframes sparkle {
+        0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+        50% { transform: translate(-50%, -50%) scale(var(--s, 1)); opacity: 1; }
+        100% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
       }
 
       .grid {
@@ -273,7 +401,11 @@
         <div class="now-playing__info">
           <p class="muted" id="device">Waiting for player…</p>
           <p class="now-playing__track" id="track">Nothing playing</p>
-          <img id="track-art" class="now-playing__art" alt="Album art">
+          <div class="now-playing__artwrap" id="art-wrap">
+            <div class="vinyl-disc" id="vinyl-disc">
+              <img id="track-art" class="now-playing__art" alt="Album art">
+            </div>
+          </div>
           <p class="muted" id="progress"></p>
         </div>
         <div class="controls">
@@ -312,6 +444,8 @@
       const deviceEl = document.getElementById('device');
       const progressEl = document.getElementById('progress');
       const artEl = document.getElementById('track-art');
+      const artWrap = document.getElementById('art-wrap');
+      const vinylDisc = document.getElementById('vinyl-disc');
       const controlButtons = document.querySelectorAll('[data-control]');
       const themeToggle = document.getElementById('theme-toggle');
       let timer;
@@ -363,7 +497,15 @@
             <h3>${name}</h3>
             <p class="muted">${desc}</p>
           </div>
-          <button class="btn btn--accent" data-playlist="${playlistUri}">Shuffle & play</button>
+          <button class="btn btn--accent sparkle-btn" data-playlist="${playlistUri}">
+            <span class="sparkle-label">Shuffle & play</span>
+            <span class="sparkle-label" aria-hidden="true">Shuffle & play</span>
+            <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><path d="M93.781 51.578C95 50.969 96 49.359 96 48c0-1.375-1-2.969-2.219-3.578 0 0-22.868-1.514-31.781-10.422-8.915-8.91-10.438-31.781-10.438-31.781C50.969 1 49.375 0 48 0s-2.969 1-3.594 2.219c0 0-1.5 22.87-10.406 31.781-8.908 8.913-31.781 10.422-31.781 10.422C1 45.031 0 46.625 0 48c0 1.359 1 2.969 2.219 3.578 0 0 22.873 1.51 31.781 10.422 8.906 8.911 10.406 31.781 10.406 31.781C45.031 95 46.625 96 48 96s2.969-1 3.562-2.219c0 0 1.523-22.871 10.438-31.781 8.913-8.908 31.781-10.422 31.781-10.422Z"/></svg>
+            <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><path d="M93.781 51.578C95 50.969 96 49.359 96 48c0-1.375-1-2.969-2.219-3.578 0 0-22.868-1.514-31.781-10.422-8.915-8.91-10.438-31.781-10.438-31.781C50.969 1 49.375 0 48 0s-2.969 1-3.594 2.219c0 0-1.5 22.87-10.406 31.781-8.908 8.913-31.781 10.422-31.781 10.422C1 45.031 0 46.625 0 48c0 1.359 1 2.969 2.219 3.578 0 0 22.873 1.51 31.781 10.422 8.906 8.911 10.406 31.781 10.406 31.781C45.031 95 46.625 96 48 96s2.969-1 3.562-2.219c0 0 1.523-22.871 10.438-31.781 8.913-8.908 31.781-10.422 31.781-10.422Z"/></svg>
+            <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><path d="M93.781 51.578C95 50.969 96 49.359 96 48c0-1.375-1-2.969-2.219-3.578 0 0-22.868-1.514-31.781-10.422-8.915-8.91-10.438-31.781-10.438-31.781C50.969 1 49.375 0 48 0s-2.969 1-3.594 2.219c0 0-1.5 22.87-10.406 31.781-8.908 8.913-31.781 10.422-31.781 10.422C1 45.031 0 46.625 0 48c0 1.359 1 2.969 2.219 3.578 0 0 22.873 1.51 31.781 10.422 8.906 8.911 10.406 31.781 10.406 31.781C45.031 95 46.625 96 48 96s2.969-1 3.562-2.219c0 0 1.523-22.871 10.438-31.781 8.913-8.908 31.781-10.422 31.781-10.422Z"/></svg>
+            <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><path d="M93.781 51.578C95 50.969 96 49.359 96 48c0-1.375-1-2.969-2.219-3.578 0 0-22.868-1.514-31.781-10.422-8.915-8.91-10.438-31.781-10.438-31.781C50.969 1 49.375 0 48 0s-2.969 1-3.594 2.219c0 0-1.5 22.87-10.406 31.781-8.908 8.913-31.781 10.422-31.781 10.422C1 45.031 0 46.625 0 48c0 1.359 1 2.969 2.219 3.578 0 0 22.873 1.51 31.781 10.422 8.906 8.911 10.406 31.781 10.406 31.781C45.031 95 46.625 96 48 96s2.969-1 3.562-2.219c0 0 1.523-22.871 10.438-31.781 8.913-8.908 31.781-10.422 31.781-10.422Z"/></svg>
+            <svg viewBox="0 0 96 96" xmlns="http://www.w3.org/2000/svg"><path d="M93.781 51.578C95 50.969 96 49.359 96 48c0-1.375-1-2.969-2.219-3.578 0 0-22.868-1.514-31.781-10.422-8.915-8.91-10.438-31.781-10.438-31.781C50.969 1 49.375 0 48 0s-2.969 1-3.594 2.219c0 0-1.5 22.87-10.406 31.781-8.908 8.913-31.781 10.422-31.781 10.422C1 45.031 0 46.625 0 48c0 1.359 1 2.969 2.219 3.578 0 0 22.873 1.51 31.781 10.422 8.906 8.911 10.406 31.781 10.406 31.781C45.031 95 46.625 96 48 96s2.969-1 3.562-2.219c0 0 1.523-22.871 10.438-31.781 8.913-8.908 31.781-10.422 31.781-10.422Z"/></svg>
+          </button>
         `;
         playlistGrid.appendChild(card);
       });
@@ -424,20 +566,23 @@
             trackEl.textContent = 'Nothing playing';
             progressEl.textContent = '';
             deviceEl.textContent = data.device ? `Device: ${data.device}` : 'No active device';
-            artEl.style.display = 'none';
+            artWrap.style.display = 'none';
             artEl.removeAttribute('src');
+            vinylDisc.classList.remove('vinyl-disc--spinning');
             return;
           }
           trackEl.textContent = `${data.track.name} — ${data.track.artists}`;
           deviceEl.textContent = data.device ? `Device: ${data.device}` : 'Device unknown';
-          if (data.track.image) {
+          const hasImage = Boolean(data.track.image);
+          if (hasImage) {
             artEl.src = data.track.image;
             artEl.alt = `${data.track.name} cover art`;
-            artEl.style.display = 'block';
+            artWrap.style.display = 'block';
           } else {
-            artEl.style.display = 'none';
+            artWrap.style.display = 'none';
             artEl.removeAttribute('src');
           }
+          vinylDisc.classList.toggle('vinyl-disc--spinning', data.isPlaying && hasImage);
           const mins = Math.floor((data.progressMs || 0) / 60000);
           const secs = Math.floor(((data.progressMs || 0) % 60000) / 1000).toString().padStart(2, '0');
           const durMins = Math.floor(data.track.durationMs / 60000);
@@ -473,6 +618,13 @@
             btn.disabled = false;
           }
         });
+      });
+
+      document.addEventListener('pointermove', (event) => {
+        const x = (event.clientX / window.innerWidth) * 100;
+        const y = (event.clientY / window.innerHeight) * 100;
+        document.body.style.setProperty('--glow-x', `${x}%`);
+        document.body.style.setProperty('--glow-y', `${y}%`);
       });
 
       themeToggle.addEventListener('click', () => {
